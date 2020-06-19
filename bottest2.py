@@ -1,13 +1,21 @@
 import random, asyncio
 from discord.ext.commands import Bot
 from discord import Game
-import os
-print (os.listdir('.'))
+from os import path
 
 token = open("tokenFile.txt", 'r')
 BOT_PREFIX = ("?", "!")
 TOKEN = token.read()
 client = Bot(command_prefix=BOT_PREFIX)
+
+#########################################################################
+#                             GLOBAL STORAGE                            #
+#########################################################################
+
+game = open("gameList.txt", 'a+')
+show = open("showList.txt", 'a+')
+game.close()
+show.close()
 
 #########################################################################
 #                               COMMANDS                                #
@@ -53,33 +61,50 @@ async def coin_flip(context):
     await context.send("Magic bot-coin says: " + str(result))
 
 # Picker command
-@client.command(aliases=['pick', 'choose', 'pickforme', 'decide'])
+@client.command(aliases=['pick', 'choose', 'pickforme', 'decide', 'random'])
 async def picker(context, *args):
-    r = random.randint(0, len(args)-1)
-    await context.send("I choose... " + args[r])
+    game = open("gameList.txt", 'r')
+    show = open("showList.txt", 'r')
+    try:
+        l = eval(args[0]).read()
+        print(l.splitlines())
+        await context.send("I choose... " + random.choice(l.splitlines()))
+        pass
+    except:
+        await context.send("I choose... " + random.choice(args))
+        pass
+    
+# Add game/show to list
+@client.command(name='add')
+async def add(context):
+    #TODO: Input validation (check for dupes)
+    game = open("gameList.txt", 'a+')
+    show = open("showList.txt", 'a+')
+    x = context.message.content.split(' ', 2)
+    eval(x[1]).write(x[2] + '\n')
+    eval(x[1]).close()
+    await context.send("Added " + x[2] + " to " + x[1] + 's')
 
-""" # rps command
-@client.command()
-async def rps(play):
-    bp = random.randint(1,3)
-    if bp == 1:
-        play = 'rock'
-    elif bp == 2:
-        play = 'paper'
-    elif bp == 3:
-        play = 'scissors' """
+# Display list
+@client.command(name='list')
+async def list(context,l):
+    #TODO: input validation
+    games = open("gameList.txt", 'r')
+    shows = open("showList.txt", 'r')
+    await context.send(eval(l).read())
+    eval(l).close()
 
 # numbers to remember
 @client.command()
-async def deaths(game):
+async def deaths(context, game):
     if game == 'ds3':   #DARK SOULS 3
-        await game.send("123 deaths")
+        await context.send("123 deaths")
     elif game == 'ds2': #DARK SOULS 2
-        await game.send("309 deaths. But like half of those don't count.")
+        await context.send("309 deaths. But like half of those don't count.")
     elif game == 'ds1': #DARK SOULS 1
-        await game.send("33 so far.")
-    elif game == 'ds3sl1': #DARK SOULS 3
-        await game.send("29 deaths")
+        await context.send("33. so far.")
+    elif game == 'ds3sl1': #DARK SOULS 3 SL1
+        await context.send("29 deaths")
 
 #########################################################################
 #                               EVENTS                                  #
@@ -98,8 +123,6 @@ async def list_servers():
         for server in client.guilds:
             print(server.name)
         await asyncio.sleep(600)
-
-#TODO: on twitch live event
 
 client.loop.create_task(list_servers())
 client.run(TOKEN)
