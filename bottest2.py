@@ -1,11 +1,12 @@
-import random, asyncio
+import random, asyncio, time
 from discord.ext.commands import Bot
-from discord import Game
+from discord import Game, File
 from os import path
 
 token = open("tokenFile.txt", 'r')
+T = token.readlines()
 BOT_PREFIX = ("?", "!")
-TOKEN = token.read()
+TOKEN = T[0]
 client = Bot(command_prefix=BOT_PREFIX)
 
 #########################################################################
@@ -16,6 +17,8 @@ game = open("gameList.txt", 'a+')
 show = open("showList.txt", 'a+')
 game.close()
 show.close()
+COW_ID = int(T[1])
+DUQ_ID = int(T[2])
 
 #########################################################################
 #                               COMMANDS                                #
@@ -105,6 +108,17 @@ async def deaths(context, game):
         await context.send("33. so far.")
     elif game == 'ds3sl1': #DARK SOULS 3 SL1
         await context.send("29 deaths")
+
+# bae TODO: read from bae channels?
+@client.command()
+async def bae(context):
+    if(context.author.id == COW_ID):
+        b = 'cowbae3.jpg'
+    elif(context.author.id == DUQ_ID):
+        b = 'duqbae.png'
+    await context.send("Finding your bae...")
+    time.sleep(2)
+    await context.send(file=File(b))
 
 #########################################################################
 #                               EVENTS                                  #
