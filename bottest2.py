@@ -24,6 +24,11 @@ DUQ_ID = int(T[2])
 #                               COMMANDS                                #
 #########################################################################
 
+# Help command
+@client.command(name='helpme')
+async def helpme(context):
+    await context.send('?help, ?8ball, ?coinflip, ?random, ?add, ?delete, ?list')
+
 # Magic 8-ball command
 @client.command(name='8ball',
                 description="Answers a yes/no question.",
@@ -86,7 +91,21 @@ async def add(context):
     x = context.message.content.split(' ', 2)
     eval(x[1]).write(x[2] + '\n')
     eval(x[1]).close()
-    await context.send("Added " + x[2] + " to " + x[1] + 's')
+    await context.send("Added " + x[2].title() + " to " + x[1].title() + 's')
+
+# Remove game/show from list
+@client.command(aliases=['del', 'delete'])
+async def remove(context):
+    game = open("gameList.txt", 'r')
+    show = open("showList.txt", 'r')
+    x = context.message.content.split(' ', 2)
+    print("attempting to remove " + x[2])
+    objList = eval(x[1]).read().splitlines()
+    objList.remove(x[2])
+    with open(eval(x[1]).name, 'w+') as f:
+        f.write('\n'.join(objList) + '\n') 
+    await context.send(x[2].title() + ' removed from ' + x[1].title() + 's')
+    eval(x[1]).close()
 
 # Display list
 @client.command(name='list')
