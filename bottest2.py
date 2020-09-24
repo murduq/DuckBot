@@ -19,6 +19,7 @@ game.close()
 show.close()
 COW_ID = int(T[1])
 DUQ_ID = int(T[2])
+UWU_LIST = ('UwU', 'OwO', 'TwT', '>w<', '^-^', 'ÒwÓ', '♡w♡', '>_<', 'XwX')
 
 #########################################################################
 #                               COMMANDS                                #
@@ -33,8 +34,7 @@ async def helpme(context):
 @client.command(name='8ball',
                 description="Answers a yes/no question.",
                 brief="Answers from the beyond",
-                aliases=['eight_ball', "eightball", '8-ball'],
-                pass_context=True)
+                aliases=['eight_ball', "eightball", '8-ball'])
 async def eight_ball(context):
     possible_responses = [
         'That is a resounding no.',
@@ -132,12 +132,28 @@ async def deaths(context, game):
 @client.command()
 async def bae(context):
     if(context.author.id == COW_ID):
-        b = 'cowbae3.jpg'
+        print('cow')
+        b = 'cowbae2.jpg'
     elif(context.author.id == DUQ_ID):
-        b = 'duqbae.png'
+        print()
+        b = 'duqbae2.jpg'
     await context.send("Finding your bae...")
-    time.sleep(2)
+    time.sleep(1)
     await context.send(file=File(b))
+
+# owo aka what is wrong with me
+@client.command()
+async def owo(context, *msgl):
+    msg=''
+    for x in msgl:
+        msg += ' ' + x
+    print(msg)
+    await context.send(msg.replace('r', 'w').replace('l', 'w') + " ~ " + random.choice(UWU_LIST))
+
+# TODO: HEADPAT COMMAND :)
+@client.command()
+async def headpat(context):
+    await context.send("https://tenor.com/view/big-hero6-baymax-there-there-patting-head-pat-head-gif-4086973")
 
 #########################################################################
 #                               EVENTS                                  #
@@ -146,8 +162,19 @@ async def bae(context):
 # confirms login in terminal
 @client.event
 async def on_ready():
-    #await client.change_presence(game=Game(name="with meatbags"))    
+    await client.change_presence(activity=Game(name="with the meatbags"))    
     print("Logged in as " + client.user.name)
+
+@client.event
+async def on_message(message):
+    if message.attachments:
+        print(message.attachments)
+        
+    pic_ext = ['.jpg','.png','.jpeg']
+    for ext in pic_ext:
+        if (message.content.endswith(ext)):
+            print("succ")
+    await client.process_commands(message)
 
 async def list_servers():
     await client.wait_until_ready()
