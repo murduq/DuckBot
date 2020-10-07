@@ -1,4 +1,5 @@
-import random, asyncio, time
+import random, asyncio, time, sqlite3
+import pandas as pd
 from discord.ext.commands import Bot
 from discord import Game, File
 from os import path
@@ -133,16 +134,16 @@ async def deaths(context, game):
 async def bae(context):
     if(context.author.id == COW_ID):
         print('cow')
-        b = 'cowbae2.jpg'
+        b = 'images/cowbae2.jpg'
     elif(context.author.id == DUQ_ID):
         print()
-        b = 'duqbae2.jpg'
+        b = 'images/duqbae2.jpg'
     await context.send("Finding your bae...")
     time.sleep(1)
     await context.send(file=File(b))
 
 # owo aka what is wrong with me
-@client.command()
+@client.command(aliases=['uwu'])
 async def owo(context, *msgl):
     msg=''
     for x in msgl:
@@ -180,8 +181,8 @@ async def list_servers():
     await client.wait_until_ready()
     while not client.is_closed:
         print("Current servers: ")
-        for server in client.guilds:
-            print(server.name)
+        for guild in client.guilds:
+            print(guild.name)
         await asyncio.sleep(600)
 
 client.loop.create_task(list_servers())
