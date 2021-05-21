@@ -72,12 +72,11 @@ async def coin_flip(context):
 # Picker command
 @client.command(aliases=['pick', 'choose', 'pickforme', 'decide', 'random'])
 async def picker(context, *args):
-    game = open("gameList.txt", 'r')
-    show = open("showList.txt", 'r')
+    sql_connect = sqlite3.connect('media.db')
     try:
-        l = eval(args[0]).read()
-        print(l.splitlines())
-        await context.send("I choose... " + random.choice(l.splitlines()))
+        pick_query = '''SELECT '''+ args[0].title() + '''.name FROM ''' + args[0].title() + ''' 
+                        ORDER BY RANDOM() LIMIT 1;'''
+        await context.send("I choose... " + sql_connect.cursor().execute(pick_query).fetchone()[0])
         pass
     except:
         await context.send("I choose... " + random.choice(args))
@@ -86,36 +85,38 @@ async def picker(context, *args):
 # Add game/show to list
 @client.command(name='add')
 async def add(context):
-    #TODO: Input validation (check for dupes)
-    game = open("gameList.txt", 'a+')
-    show = open("showList.txt", 'a+')
+    sql_connect = sqlite3.connect('media.db')
     x = context.message.content.split(' ', 2)
-    eval(x[1]).write(x[2] + '\n')
-    eval(x[1]).close()
-    await context.send("Added " + x[2].title() + " to " + x[1].title() + 's')
+    add_query = '''INSERT INTO ''' + x[1].title() + '''(name) VALUES ("''' + x[2].title() + '''");'''
+    sql_connect.cursor().execute(add_query)
+    sql_connect.commit()
+    sql_connect.cursor().close()
+    await context.send("Added " + x[2].title() + " to " + x[1].title())
 
 # Remove game/show from list
 @client.command(aliases=['del', 'delete'])
 async def remove(context):
-    game = open("gameList.txt", 'r')
-    show = open("showList.txt", 'r')
+    sql_connect = sqlite3.connect('media.db')
     x = context.message.content.split(' ', 2)
+    del_query = '''DELETE FROM ''' + x[1].title() + ''' WHERE name = "''' + x[2].title() + '''";'''
     print("attempting to remove " + x[2])
-    objList = eval(x[1]).read().splitlines()
-    objList.remove(x[2])
-    with open(eval(x[1]).name, 'w+') as f:
-        f.write('\n'.join(objList) + '\n') 
-    await context.send(x[2].title() + ' removed from ' + x[1].title() + 's')
-    eval(x[1]).close()
+    sql_connect.cursor().execute(del_query)
+    sql_connect.commit()
+    sql_connect.cursor().close()
+    await context.send(x[2].title() + ' removed from ' + x[1].title())
 
 # Display list
 @client.command(name='list')
 async def list(context,l):
-    #TODO: input validation
-    games = open("gameList.txt", 'r')
-    shows = open("showList.txt", 'r')
-    await context.send(eval(l).read())
-    eval(l).close()
+    names = []
+    sql_connect = sqlite3.connect('media.db')
+    list_query = '''SELECT ''' + l.title() + '''.name FROM ''' + l.title()
+    tempNames = sql_connect.cursor().execute(list_query).fetchall()
+    for x in tempNames:
+        names.append(x[0])
+    sql_connect.cursor().close()
+    await context.send(', '.join(names))
+    
 
 # numbers to remember
 @client.command()
@@ -149,7 +150,7 @@ async def owo(context, *msgl):
     for x in msgl:
         msg += ' ' + x
     print(msg)
-    await context.send(msg.replace('r', 'w').replace('l', 'w') + " ~ " + random.choice(UWU_LIST))
+    await context.send(msg.replace('r', 'w').replace('l', 'w').replace('L', 'W').replace('R','W') + " ~ " + random.choice(UWU_LIST))
 
 # TODO: HEADPAT COMMAND :)
 @client.command()
