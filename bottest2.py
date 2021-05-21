@@ -1,5 +1,6 @@
 import random, asyncio, time, sqlite3
 import pandas as pd
+import discord
 from discord.ext.commands import Bot
 from discord import Game, File
 from os import path
@@ -21,6 +22,8 @@ show.close()
 COW_ID = int(T[1])
 DUQ_ID = int(T[2])
 UWU_LIST = ('UwU', 'OwO', 'TwT', '>w<', '^-^', 'ÒwÓ', '♡w♡', '>_<', 'XwX')
+vc = None
+player = None
 
 #########################################################################
 #                               COMMANDS                                #
@@ -117,7 +120,6 @@ async def list(context,l):
     sql_connect.cursor().close()
     await context.send(', '.join(names))
     
-
 # numbers to remember
 @client.command()
 async def deaths(context, game):
@@ -157,6 +159,7 @@ async def owo(context, *msgl):
 async def headpat(context):
     await context.send("https://tenor.com/view/big-hero6-baymax-there-there-patting-head-pat-head-gif-4086973")
 
+
 #########################################################################
 #                               EVENTS                                  #
 #########################################################################
@@ -178,6 +181,23 @@ async def on_message(message):
             print("succ")
     await client.process_commands(message)
 
+# tiktok meme
+@client.event
+async def on_voice_state_update(member, before, after):
+    global vc
+    global player
+    tormentedSoul = ['duq', 'cow']
+    if before.channel is None and after.channel is not None and member.name in tormentedSoul:
+        if vc is None or not vc.is_connected():
+            # await member.guild.system_channel.send("Alarm!")
+            vc = await after.channel.connect()
+            vc.play(discord.FFmpegPCMAudio(executable="C:/FFmpeg/bin/ffmpeg.exe", source="audio/nyan.mp3"))
+            print("now annoying " + member.name)
+        
+    if after.channel is None and before.channel is not None and member.name in tormentedSoul:
+        await vc.disconnect()
+        print("PauseChamp")
+        
 async def list_servers():
     await client.wait_until_ready()
     while not client.is_closed:
