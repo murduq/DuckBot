@@ -133,17 +133,22 @@ async def deaths(context, game):
         await context.send("29 deaths")
 
 # bae TODO: read from bae channels?
-@client.command()
+@client.command(aliases=['waifu'])
 async def bae(context):
     if(context.author.id == COW_ID):
         print('cow')
-        b = 'images/cowbae2.jpg'
+        bf = open('cowbaes.txt', 'r')
+        lines = bf.read().splitlines()
+        b = random.choice(lines)
     elif(context.author.id == DUQ_ID):
         print()
-        b = 'images/duqbae2.jpg'
+        bf = open('duqbaes.txt', 'r')
+        lines = bf.read().splitlines()
+        b = random.choice(lines)
+    bf.close()
     await context.send("Finding your bae...")
     time.sleep(1)
-    await context.send(file=File(b))
+    await context.send(b)
 
 # owo aka what is wrong with me
 @client.command(aliases=['uwu'])
@@ -159,6 +164,8 @@ async def owo(context, *msgl):
 async def headpat(context):
     await context.send("https://tenor.com/view/big-hero6-baymax-there-there-patting-head-pat-head-gif-4086973")
 
+async def tempImageSender(context, toSend):
+    await context.send(toSend)
 
 #########################################################################
 #                               EVENTS                                  #
@@ -172,13 +179,19 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.attachments:
-        print(message.attachments)
-        
-    pic_ext = ['.jpg','.png','.jpeg']
-    for ext in pic_ext:
-        if (message.content.endswith(ext)):
-            print("succ")
+    if message.attachments and message.channel.name in ['butts', 'duq-butts']:
+        pic_ext = ['.jpg','.png','.jpeg','.webp','.gif']
+        for ext in pic_ext:
+            if (message.attachments[0].filename.endswith(ext)):
+                print('succ')
+                if message.channel.name == 'butts':
+                    bf = open('cowbaes.txt', 'a')
+                    bf.write(message.attachments[0].url)
+                elif message.channel.name == 'duq-butts':
+                    bf = open('duqbaes.txt', 'a')
+                    bf.write(message.attachments[0].url)
+                bf.close()                
+                #message.attachments[0].save()
     await client.process_commands(message)
 
 # tiktok meme
