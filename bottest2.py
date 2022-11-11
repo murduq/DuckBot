@@ -9,7 +9,7 @@ token = open("tokenFile.txt", 'r')
 T = token.readlines()
 BOT_PREFIX = ("?", "!")
 TOKEN = T[0]
-client = Bot(command_prefix=BOT_PREFIX)
+client = Bot(command_prefix=BOT_PREFIX, intents=discord.Intents.all())
 
 #########################################################################
 #                             GLOBAL STORAGE                            #
@@ -186,7 +186,7 @@ async def on_message(message):
 async def on_voice_state_update(member, before, after):
     global vc
     global player
-    tormentedSoul = ['duq', 'cow']
+    tormentedSoul = []
     if before.channel is None and after.channel is not None and member.name in tormentedSoul:
         if vc is None or not vc.is_connected():
             # await member.guild.system_channel.send("Alarm!")
@@ -206,5 +206,5 @@ async def list_servers():
             print(guild.name)
         await asyncio.sleep(600)
 
-client.loop.create_task(list_servers())
+# client.loop.create_task(list_servers())
 client.run(TOKEN)
